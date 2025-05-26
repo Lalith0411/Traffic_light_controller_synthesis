@@ -138,6 +138,37 @@ endmodule
 
 •	In your terminal type “gedit input_constraints.sdc” to create an SDC File if you do not have one.
 
+```
+create_clock -name clk -period 1 -waveform {0 0.5} [get_ports "clk"]
+set_clock_transition -rise 0.1 [get_clocks "clk"]
+set_clock_transition -fall 0.1 [get_clocks "clk"]
+set_clock_uncertainty 0.01 [get_ports "clk"]
+set_input_delay -max 1.0 -clock clk [all_inputs]
+set_output_delay -max 1.0 -clock clk [all_outputs]
+```
+```
+read_libs /cadence/install/FOUNDRY-01/digital/90nm/dig/lib/slow.lib
+read_hdl traffilight.v
+elaborate
+read_sdc input_constraints.sdc
+
+syn_generic
+syn_map
+syn_opt
+
+write_hdl > traffic_netlist_without.v
+write_sdc  > output_constraints.sdc
+
+gui_show
+
+report timing > traffic_timing.rpt
+report power > traffic_power.rpt
+report area > traffic_cell.rpt
+report gates > traffic_gates.rpt
+   
+```
+
+
 ### Step 3 : Performing Synthesis
 
 The Liberty files are present in the library path,
